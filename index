@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolatore Artigiano Completo</title>
+    <style>
+        :root {
+            --systemBackground: #f2f2f7;
+            --label: #000000;
+            --secondaryLabel: #3c3c4399;
+            --tertiaryLabel: #3c3c434d;
+            --systemFill: #78788033;
+            --systemBlue: #0a84ff;
+            --systemGreen: #34c759;
+            --systemOrange: #ff9500;
+            --systemPurple: #af52de;
+            --systemGray: #8e8e93;
+            --systemRed: #ff3b30;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --systemBackground: #000000;
+                --label: #ffffff;
+                --secondaryLabel: #ebebf599;
+                --tertiaryLabel: #ebebf54d;
+                --systemFill: #7878805e;
+            }
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--systemBackground);
+            color: var(--label);
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.5;
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--systemGray);
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--systemBlue);
+            color: var(--systemBlue);
+        }
+        
+        .card {
+            background-color: var(--systemFill);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            font-size: 14px;
+            color: var(--secondaryLabel);
+            margin-bottom: 5px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            background-color: transparent;
+            border: none;
+            border-bottom: 1px solid var(--systemGray);
+            color: var(--label);
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-bottom-color: var(--systemBlue);
+        }
+        
+        .result {
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .result-total {
+            color: var(--systemGreen);
+        }
+        
+        .result-margin {
+            color: var(--systemOrange);
+        }
+        
+        .result-material {
+            color: var(--systemPurple);
+        }
+        
+        .small-text {
+            font-size: 12px;
+            color: var(--tertiaryLabel);
+            text-align: center;
+            margin-top: 5px;
+        }
+        
+        button {
+            background-color: var(--systemBlue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 16px;
+            width: 100%;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background-color: #0071e3;
+        }
+        
+        .button-secondary {
+            background-color: var(--systemGray);
+            margin-top: 10px;
+        }
+        
+        .button-danger {
+            background-color: var(--systemRed);
+        }
+        
+        .divider {
+            height: 1px;
+            background-color: var(--systemFill);
+            margin: 20px 0;
+        }
+        
+        .info-bubble {
+            background-color: var(--systemBlue);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            margin-left: 5px;
+            cursor: help;
+            position: relative;
+        }
+        
+        .tooltip {
+            position: absolute;
+            background-color: var(--label);
+            color: var(--systemBackground);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 200px;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+            display: none;
+        }
+        
+        .info-bubble:hover .tooltip {
+            display: block;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .margin-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--systemGray);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 20px 0 10px;
+            color: var(--systemBlue);
+        }
+        
+        .thickness-info {
+            font-size: 12px;
+            color: var(--tertiaryLabel);
+            margin-top: 5px;
+        }
+        
+        .material-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .material-actions button {
+            flex: 1;
+        }
+        
+        #editMaterialForm {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Calcolatore Artigiano</h1>
+    
+    <div class="tab-container">
+        <div class="tab active" onclick="switchTab('meters')">Calcolo Metri</div>
+        <div class="tab" onclick="switchTab('material')">Calcolo Materiale</div>
+    </div>
+    
+    <!-- TAB 1: CALCOLO METRI -->
+    <div id="metersTab">
+        <div class="card">
+            <div class="input-group">
+                <label for="dailyTarget">Compenso giornaliero per persona (€)
+                    <span class="info-bubble">i
+                        <span class="tooltip">Il compenso che desideri ottenere per ogni lavoratore</span>
+                    </span>
+                </label>
+                <input type="number" id="dailyTarget" placeholder="Es. 100" value="100">
+            </div>
+            
+            <div class="input-group">
+                <label for="pricePerMeter">Prezzo al metro (€/m²)</label>
+                <input type="number" id="pricePerMeter" placeholder="Es. 5" value="5">
+            </div>
+            
+            <div class="input-group">
+                <label for="workers">Numero di persone al lavoro</label>
+                <input type="number" id="workers" placeholder="Es. 1" value="1" min="1">
+            </div>
+            
+            <div class="input-group">
+                <label for="workType">Tipo di lavorazione</label>
+                <select id="workType" onchange="toggleMarginSection()">
+                    <option value="standard">Standard (1 giorno)</option>
+                    <option value="multiday">Multi-giorno (es. cappotto)</option>
+                </select>
+            </div>
+            
+            <div id="marginSection" class="margin-section hidden">
+                <div class="input-group">
+                    <label for="marginPercent">Margine per lavorazione multi-giorno (%)
+                        <span class="info-bubble">i
+                            <span class="tooltip">Percentuale di metri in più da considerare per lavorazioni che richiedono più giorni (es. 20% per cappotto)</span>
+                        </span>
+                    </label>
+                    <input type="number" id="marginPercent" placeholder="Es. 20" value="20" min="0" max="100">
+                </div>
+            </div>
+            
+            <button onclick="calculateMeters()">Calcola</button>
+        </div>
+        
+        <div class="card" id="metersResultCard" style="display: none;">
+            <div class="result result-total" id="metersResult"></div>
+            <div class="small-text">metri quadrati totali da lavorare oggi</div>
+            
+            <div id="marginResultContainer" class="hidden">
+                <div class="divider"></div>
+                <div class="result result-margin" id="resultWithMargin"></div>
+                <div class="small-text">metri con margine del <span id="marginPercentValue">0</span>%</div>
+                <div class="small-text">(per lavorazioni multi-giorno)</div>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="result result-total" id="compensoTotale"></div>
+            <div class="small-text">compenso totale del team</div>
+        </div>
+    </div>
+    
+    <!-- TAB 2: CALCOLO MATERIALE -->
+    <div id="materialTab" class="hidden">
+        <div class="card">
+            <div class="input-group">
+                <label for="totalMeters">Metri quadrati da lavorare (m²)</label>
+                <input type="number" id="totalMeters" placeholder="Es. 50" value="50">
+            </div>
+            
+            <div class="input-group">
+                <label for="materialSelect">Materiale</label>
+                <select id="materialSelect" onchange="loadMaterialData()">
+                    <option value="">-- Seleziona materiale --</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="materialPrice">Prezzo materiale al sacco (€)</label>
+                <input type="number" id="materialPrice" placeholder="Es. 25" value="25">
+            </div>
+            
+            <div class="input-group">
+                <label for="coveragePerBag">Resa per sacco (m²/sacco)
+                    <span class="info-bubble">i
+                        <span class="tooltip">Quanti metri quadrati copre un sacco con lo spessore standard indicato dal produttore</span>
+                    </span>
+                </label>
+                <input type="number" step="0.1" id="coveragePerBag" placeholder="Es. 1.5" value="1.5">
+            </div>
+            
+            <div class="input-group">
+                <label for="standardThickness">Spessore standard (cm)
+                    <span class="info-bubble">i
+                        <span class="tooltip">Spessore di riferimento indicato dal produttore per la resa</span>
+                    </span>
+                </label>
+                <input type="number" step="0.1" id="standardThickness" placeholder="Es. 1 cm" value="1" min="0.1" max="10">
+            </div>
+            
+            <div class="input-group">
+                <label for="actualThickness">Spessore effettivo richiesto (cm)
+                    <span class="info-bubble">i
+                        <span class="tooltip">Spessore che devi realmente applicare (es. 0.5 cm per sottile, 1.5 cm per spesso)</span>
+                    </span>
+                </label>
+                <input type="number" step="0.1" id="actualThickness" placeholder="Es. 1 cm" value="1" min="0.1" max="10">
+                <div class="thickness-info" id="thicknessComparison"></div>
+            </div>
+            
+            <div class="material-actions">
+                <button onclick="calculateMaterial()">Calcola</button>
+                <button class="button-secondary" onclick="toggleMaterialForm()">Gestisci Materiali</button>
+            </div>
+        </div>
+        
+        <div class="card hidden" id="editMaterialForm">
+            <div class="section-title">Gestione Materiali</div>
+            
+            <div class="input-group">
+                <label for="newMaterialName">Nome Materiale</label>
+                <input type="text" id="newMaterialName" placeholder="Es. Fassa Bortolo KD2 Intonaco">
+            </div>
+            
+            <div class="input-group">
+                <label for="newMaterialPrice">Prezzo al sacco (€)</label>
+                <input type="number" step="0.01" id="newMaterialPrice" placeholder="Es. 25.50">
+            </div>
+            
+            <div class="input-group">
+                <label for="newMaterialCoverage">Resa per sacco (m²)</label>
+                <input type="number" step="0.1" id="newMaterialCoverage" placeholder="Es. 1.5">
+            </div>
+            
+            <div class="input-group">
+                <label for="newMaterialThickness">Spessore standard (cm)</label>
+                <input type="number" step="0.1" id="newMaterialThickness" placeholder="Es. 1.0">
+            </div>
+            
+            <div class="material-actions">
+                <button onclick="saveMaterial()">Salva Materiale</button>
+                <button class="button-danger" onclick="deleteMaterial()">Elimina Materiale</button>
+            </div>
+            
+            <button class="button-secondary" onclick="toggleMaterialForm(false)">Chiudi</button>
+        </div>
+        
+        <div class="card" id="materialResultCard" style="display: none;">
+            <div class="section-title">Risultati Materiale</div>
+            
+            <div class="result result-material" id="bagsNeeded"></div>
+            <div class="small-text">sacchi necessari</div>
+            
+            <div class="divider"></div>
+            
+            <div class="result result-material" id="totalMaterialCost"></div>
+            <div class="small-text">costo totale materiale</div>
+            
+            <div class="divider"></div>
+            
+            <div class="result result-total" id="costPerMeter"></div>
+            <div class="small-text">costo al metro quadrato</div>
+            
+            <div class="divider"></div>
+            
+            <div class="result result-margin" id="materialPerMeter"></div>
+            <div class="small-text">kg/m² (se conosci il peso per sacco)</div>
+        </div>
+    </div>
+    
+    <script>
+        // Database materiali con dati tecnici precisi
+        let materials = [];
+        
+        // Tab switching
+        function switchTab(tabName) {
+            document.getElementById('metersTab').classList.toggle('hidden', tabName !== 'meters');
+            document.getElementById('materialTab').classList.toggle('hidden', tabName !== 'material');
+            
+            // Update tab styles
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            if (tabName === 'meters') {
+                document.querySelector('.tab:nth-child(1)').classList.add('active');
+            } else {
+                document.querySelector('.tab:nth-child(2)').classList.add('active');
+                loadMaterials();
+            }
+        }
+        
+        // METERS CALCULATION
+        function toggleMarginSection() {
+            const workType = document.getElementById('workType').value;
+            const marginSection = document.getElementById('marginSection');
+            const marginResultContainer = document.getElementById('marginResultContainer');
+            
+            if (workType === 'multiday') {
+                marginSection.classList.remove('hidden');
+                marginResultContainer.classList.remove('hidden');
+            } else {
+                marginSection.classList.add('hidden');
+                marginResultContainer.classList.add('hidden');
+            }
+            
+            calculateMeters();
+        }
+        
+        function calculateMeters() {
+            // Get input values
+            const dailyTargetPerPerson = parseFloat(document.getElementById('dailyTarget').value);
+            const pricePerMeter = parseFloat(document.getElementById('pricePerMeter').value);
+            const workers = parseInt(document.getElementById('workers').value);
+            const workType = document.getElementById('workType').value;
+            const marginPercent = parseFloat(document.getElementById('marginPercent').value) || 0;
+            
+            // Calculate base results
+            const metersPerPerson = dailyTargetPerPerson / pricePerMeter;
+            let totalMeters = metersPerPerson * workers;
+            const totalCompenso = dailyTargetPerPerson * workers;
+            
+            // Apply margin if needed
+            let metersWithMargin = totalMeters;
+            if (workType === 'multiday' && marginPercent > 0) {
+                const marginMultiplier = 1 + (marginPercent / 100);
+                metersWithMargin = totalMeters * marginMultiplier;
+                document.getElementById('marginPercentValue').textContent = marginPercent;
+            }
+            
+            // Display results
+            document.getElementById('metersResult').textContent = totalMeters.toFixed(2) + ' m²';
+            document.getElementById('resultWithMargin').textContent = metersWithMargin.toFixed(2) + ' m²';
+            document.getElementById('compensoTotale').textContent = totalCompenso.toFixed(2) + ' €';
+            document.getElementById('metersResultCard').style.display = 'block';
+        }
+        
+        // MATERIAL CALCULATION
+        function updateThicknessComparison() {
+            const standard = parseFloat(document.getElementById('standardThickness').value);
+            const actual = parseFloat(document.getElementById('actualThickness').value);
+            
+            let comparisonText = "";
+            if (actual > standard) {
+                const percentMore = ((actual - standard) / standard * 100).toFixed(0);
+                comparisonText = `Attenzione: stai applicando ${percentMore}% di materiale in più rispetto allo standard`;
+            } else if (actual < standard) {
+                const percentLess = ((standard - actual) / standard * 100).toFixed(0);
+                comparisonText = `Stai applicando ${percentLess}% di materiale in meno rispetto allo standard`;
+            } else {
+                comparisonText = "Stai applicando lo spessore standard";
+            }
+            
+            document.getElementById('thicknessComparison').textContent = comparisonText;
+        }
+        
+        function calculateMaterial() {
+            // Get input values
+            const totalMeters = parseFloat(document.getElementById('totalMeters').value);
+            const materialPrice = parseFloat(document.getElementById('materialPrice').value);
+            const coveragePerBag = parseFloat(document.getElementById('coveragePerBag').value);
+            const standardThickness = parseFloat(document.getElementById('standardThickness').value);
+            const actualThickness = parseFloat(document.getElementById('actualThickness').value);
+            
+            // Calculate thickness adjustment
+            const thicknessRatio = actualThickness / standardThickness;
+            const adjustedCoverage = coveragePerBag / thicknessRatio;
+            const bagsNeeded = Math.ceil(totalMeters / adjustedCoverage);
+            const totalCost = bagsNeeded * materialPrice;
+            const costPerMeter = totalCost / totalMeters;
+            
+            // Display results
+            document.getElementById('bagsNeeded').textContent = bagsNeeded;
+            document.getElementById('totalMaterialCost').textContent = totalCost.toFixed(2) + ' €';
+            document.getElementById('costPerMeter').textContent = costPerMeter.toFixed(2) + ' €/m²';
+            document.getElementById('materialResultCard').style.display = 'block';
+            
+            // Update thickness comparison
+            updateThicknessComparison();
+        }
+        
+        // MATERIALS DATABASE FUNCTIONS
+        function loadMaterials() {
+            // Load from localStorage
+            const savedMaterials = localStorage.getItem('artisanMaterials');
+            if (savedMaterials) {
+                materials = JSON.parse(savedMaterials);
+            } else {
+                // Default materials with precise technical data
+                materials = [
+                    {
+                        name: "Fassa Bortolo KD2 Intonaco",
+                        price: 28.50, 
+                        coverage: 1.6, // 16kg/m² a 1cm - sacco da 25kg
+                        thickness: 1.0
+                    },
+                    {
+                        name: "Röfix Renoplus",
+                        price: 31.00,
+                        coverage: 1.7, // 15kg/m² a 1cm - sacco da 25kg
+                        thickness: 1.0
+                    },
+                    {
+                        name: "Röfix 715",
+                        price: 29.50,
+                        coverage: 1.8, // 14kg/m² a 1cm - sacco da 25kg
+                        thickness: 1.0
+                    },
+                    {
+                        name: "Mapei Mapetherm AR1",
+                        price: 34.00,
+                        coverage: 1.4, // 18kg/m² a 1cm - sacco da 25kg
+                        thickness: 1.0
+                    },
+                    {
+                        name: "Kerakoll Klimafix",
+                        price: 36.50,
+                        coverage: 1.3, // 19kg/m² a 1cm - sacco da 25kg
+                        thickness: 1.0
+                    }
+                ];
+                saveMaterialsToStorage();
+            }
+            
+            // Populate select
+            const select = document.getElementById('materialSelect');
+            select.innerHTML = '<option value="">-- Seleziona materiale --</option>';
+            
+            materials.forEach((material, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = material.name;
+                select.appendChild(option);
+            });
+        }
+        
+        function loadMaterialData() {
+            const select = document.getElementById('materialSelect');
+            const selectedIndex = select.value;
+            
+            if (selectedIndex === "") return;
+            
+            const material = materials[selectedIndex];
+            document.getElementById('materialPrice').value = material.price;
+            document.getElementById('coveragePerBag').value = material.coverage;
+            document.getElementById('standardThickness').value = material.thickness;
+            
+            // Recalculate
+            calculateMaterial();
+        }
+        
+        function toggleMaterialForm(show = true) {
+            const form = document.getElementById('editMaterialForm');
+            form.classList.toggle('hidden', !show);
+            
+            if (show) {
+                const select = document.getElementById('materialSelect');
+                const selectedIndex = select.value;
+                
+                if (selectedIndex !== "") {
+                    // Load selected material data
+                    const material = materials[selectedIndex];
+                    document.getElementById('newMaterialName').value = material.name;
+                    document.getElementById('newMaterialPrice').value = material.price;
+                    document.getElementById('newMaterialCoverage').value = material.coverage;
+                    document.getElementById('newMaterialThickness').value = material.thickness;
+                } else {
+                    // Clear form for new material
+                    document.getElementById('newMaterialName').value = "";
+                    document.getElementById('newMaterialPrice').value = "";
+                    document.getElementById('newMaterialCoverage').value = "";
+                    document.getElementById('newMaterialThickness').value = "";
+                }
+            }
+        }
+        
+        function saveMaterial() {
+            const select = document.getElementById('materialSelect');
+            const selectedIndex = select.value;
+            
+            const name = document.getElementById('newMaterialName').value.trim();
+            const price = parseFloat(document.getElementById('newMaterialPrice').value);
+            const coverage = parseFloat(document.getElementById('newMaterialCoverage').value);
+            const thickness = parseFloat(document.getElementById('newMaterialThickness').value);
+            
+            if (!name || isNaN(price) || isNaN(coverage) || isNaN(thickness)) {
+                alert("Per favore compila tutti i campi correttamente");
+                return;
+            }
+            
+            const newMaterial = {
+                name,
+                price,
+                coverage,
+                thickness
+            };
+            
+            if (selectedIndex === "") {
+                // Add new material
+                materials.push(newMaterial);
+                alert(`Materiale "${name}" aggiunto con successo!`);
+            } else {
+                // Update existing material
+                materials[selectedIndex] = newMaterial;
+                alert(`Materiale "${name}" aggiornato con successo!`);
+            }
+            
+            saveMaterialsToStorage();
+            loadMaterials();
+            
+            // Select the saved material
+            const indexToSelect = selectedIndex === "" ? materials.length - 1 : parseInt(selectedIndex);
+            document.getElementById('materialSelect').value = indexToSelect;
+            loadMaterialData();
+            
+            toggleMaterialForm(false);
+        }
+        
+        function deleteMaterial() {
+            const select = document.getElementById('materialSelect');
+            const selectedIndex = select.value;
+            
+            if (selectedIndex === "") {
+                alert("Nessun materiale selezionato da eliminare");
+                return;
+            }
+            
+            const materialName = materials[selectedIndex].name;
+            if (confirm(`Sei sicuro di voler eliminare "${materialName}"?`)) {
+                materials.splice(selectedIndex, 1);
+                saveMaterialsToStorage();
+                loadMaterials();
+                toggleMaterialForm(false);
+                alert(`Materiale "${materialName}" eliminato`);
+            }
+        }
+        
+        function saveMaterialsToStorage() {
+            localStorage.setItem('artisanMaterials', JSON.stringify(materials));
+        }
+        
+        // Initialize and set up event listeners
+        window.onload = function() {
+            calculateMeters();
+            toggleMarginSection();
+            loadMaterials();
+            
+            // Add event listeners for material calculation
+            document.getElementById('totalMeters').addEventListener('input', calculateMaterial);
+            document.getElementById('materialPrice').addEventListener('input', calculateMaterial);
+            document.getElementById('coveragePerBag').addEventListener('input', calculateMaterial);
+            document.getElementById('standardThickness').addEventListener('input', function() {
+                updateThicknessComparison();
+                calculateMaterial();
+            });
+            document.getElementById('actualThickness').addEventListener('input', function() {
+                updateThicknessComparison();
+                calculateMaterial();
+            });
+        };
+    </script>
+</body>
+</html>
